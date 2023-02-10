@@ -26,6 +26,13 @@ async function start() {
     }
   );
 
+  console.log("MyCareersFuture Jobs: " + myCTJobs);
+
+  await fs.writeFile("test.json", JSON.stringify(myCTJobs), (err) => {
+    if (err) throw err;
+    console.log("File saved");
+  });
+
   //   const myCTJobsTest = await page.$$eval(
   //     "#search-results .card-list div div a",
   //     (links) => {
@@ -52,12 +59,6 @@ async function start() {
 
   //   console.log("Names: " + names);
   //   console.log(indeedJobs);
-  console.log("MyCareersFuture Jobs: " + myCTJobs);
-
-  await fs.writeFile("test.json", JSON.stringify(myCTJobs), (err) => {
-    if (err) throw err;
-    console.log("File saved");
-  });
 
   await browser.close();
 }
