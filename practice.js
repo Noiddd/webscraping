@@ -2,14 +2,13 @@ const puppeteer = require("puppeteer");
 const fs = require("fs/promises");
 
 (async () => {
-  let jobs = [];
-
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
   await page.goto(
     "https://www.mycareersfuture.gov.sg/search?search=remote&sortBy=new_posting_date&page=0"
   );
 
+  let jobs = [];
   let isLastPageRemote = false;
 
   while (!isLastPageRemote) {
