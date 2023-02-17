@@ -27,41 +27,44 @@ const fs = require("fs/promises");
 
   // Collecting job data
   while (!isLastPage) {
-    const jobData = await page.evaluate(() => {
-      jobContainer = Array.from(
-        document.querySelectorAll(
-          "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon"
-        )
+    // const jobData = await page.evaluate(() => {
+    //   jobContainer = Array.from(
+    //     document.querySelectorAll(
+    //       "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon"
+    //     )
+    //   );
+
+    //   console.log("jobcontainer" + jobContainer);
+
+    //   const jobs = jobContainer.map((jobLink) => ({
+    //     jobTitle: jobLink.querySelector("h2 a span").textContent,
+    //     companyName: jobLink.querySelector("span.companyName").textContent,
+    //   }));
+
+    //   return jobs;
+    // });
+
+    // console.log(jobData);
+    // console.log(jobData.length);
+
+    const jobsTest = await page.$$(
+      "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon"
+    );
+
+    for (const jobLink of jobsTest) {
+      await jobLink.click();
+
+      await page.waitForSelector("#jobsearch-ViewjobPaneWrapper");
+
+      const jobDescription = await page.$eval(
+        "#jobDescriptionText",
+        (el) => el.textContent
       );
 
-      console.log(jobContainer);
+      console.log(jobDescription);
+    }
 
-      const jobs = jobContainer.map((jobLink) => ({
-        jobTitle: jobLink.querySelector("h2 a span").textContent,
-      }));
-
-      return jobs;
-    });
-
-    console.log(jobData);
-    // const jobContainer = await page.$$eval(
-    //   "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon",
-    //   (jobContainer) => {
-    //     return jobContainer.map((jobLink) => {
-    //       return jobLink.querySelector("h2 a span").textContent;
-    //     });
-    //   }
-    // );
-
-    // console.log(jobContainer);
-
-    // for (jobLink of jobContainer) {
-    //   const jobTitle = jobLink.querySelector("h2 a span").textContent;
-
-    //   jobs.push({ jobTitle });
-    // }
-
-    // console.log(jobs);
+    console.log(jobsTest);
 
     isLastPage = true;
   }
