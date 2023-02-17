@@ -8,35 +8,70 @@ const fs = require("fs/promises");
   const page = await browser.newPage();
   await page.goto("https://sg.indeed.com");
 
+  //Wait for input field to load
+  await page.waitForSelector("#text-input-what");
+
   // Inputing search fields
   await page.type("#text-input-what", "remote");
-  await page.type("#text-input-where", "singapore");
+  await page.type("#text-input-where", "remote");
 
   // Clicking on search button
   await page.click("#jobsearch button");
 
-  // Waiting for filter location to load then clicking on it
-  await page.waitForSelector("#filter-loc");
-  await page.click("#filter-loc");
+  // Wait for first job to load
+  await page.waitForSelector("#mosaic-provider-jobcards ul li:nth-child(1)");
 
-  // Waiting for drop down then click on "Remote"
-  await page.waitForSelector("#filter-loc-menu li:nth-child(2)");
-  //   const test = await page.$eval("#filter-loc-menu li:nth-child(2)", (el) =>
-  //     el.click()
-  //   );
-  //   console.log(test);
-  //   await page.click("#filter-loc-menu li:nth-child(2)");
+  // Entry point for collecting data
+  let pageNumber = 0;
+  let isLastPage = false;
 
   // Collecting job data
+  while (!isLastPage) {
+    const jobData = await page.evaluate(() => {
+      jobContainer = Array.from(
+        document.querySelectorAll(
+          "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon"
+        )
+      );
 
-  const jobContainer = await page.$$eval(
-    "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon",
-    (jobContainer) => {
-      return jobContainer.map((jobLink) => ({
+      console.log(jobContainer);
+
+      const jobs = jobContainer.map((jobLink) => ({
         jobTitle: jobLink.querySelector("h2 a span").textContent,
       }));
-    }
-  );
 
-  console.log(jobContainer);
+      return jobs;
+    });
+
+    console.log(jobData);
+    // const jobContainer = await page.$$eval(
+    //   "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon",
+    //   (jobContainer) => {
+    //     return jobContainer.map((jobLink) => {
+    //       return jobLink.querySelector("h2 a span").textContent;
+    //     });
+    //   }
+    // );
+
+    // console.log(jobContainer);
+
+    // for (jobLink of jobContainer) {
+    //   const jobTitle = jobLink.querySelector("h2 a span").textContent;
+
+    //   jobs.push({ jobTitle });
+    // }
+
+    // console.log(jobs);
+
+    isLastPage = true;
+  }
+
+  // await fs.writeFile(
+  //   "indeed-remote.json",
+  //   JSON.stringify(jobContainer),
+  //   (err) => {
+  //     if (err) throw err;
+  //     console.log("File saved");
+  //   }
+  // );
 })();
