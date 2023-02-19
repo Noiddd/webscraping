@@ -47,12 +47,48 @@ const fs = require("fs/promises");
     // console.log(jobData);
     // console.log(jobData.length);
 
-    const jobsTest = await page.$$(
+    let jobs = [];
+
+    await page.waitForSelector(
       "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon"
     );
 
-    for (const jobLink of jobsTest) {
-      await jobLink.click();
+    const jobsData = await page.$$eval(
+      "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon",
+      (el) =>
+        el.map((jobData) => {
+          const jobTitle = jobData.querySelector("h2 a span").textContent;
+          const companyName = jobData.querySelector(
+            "tbody tr td div.heading6.company_location.tapItem-gutter.companyInfo span"
+          ).textContent;
+
+          let salaryRange = "";
+          let salaryExtract = "";
+
+          try {
+            salaryExtract = jobData.querySelector(
+              "tbody tr td div div.salary-snippet-container div"
+            ).textContent;
+          } catch (error) {}
+          salaryRange = salaryExtract.replace("-", "");
+
+          return {
+            jobTitle,
+            companyName,
+            salaryRange,
+          };
+        })
+    );
+
+    console.log(jobsData);
+    console.log(jobsData.length);
+
+    const jobsContainer = await page.$$(
+      "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon"
+    );
+
+    for (let i = 0; i < jobsContainer.length; i++) {
+      await jobsContainer[i].click();
 
       await page.waitForSelector("#jobsearch-ViewjobPaneWrapper");
 
@@ -60,11 +96,7 @@ const fs = require("fs/promises");
         "#jobDescriptionText",
         (el) => el.textContent
       );
-
-      console.log(jobDescription);
     }
-
-    console.log(jobsTest);
 
     isLastPage = true;
   }
