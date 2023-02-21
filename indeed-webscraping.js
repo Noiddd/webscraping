@@ -1,11 +1,17 @@
-const puppeteer = require("puppeteer");
-const fs = require("fs/promises");
-const { start } = require("repl");
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+puppeteer.use(StealthPlugin());
+const { executablePath } = require("puppeteer");
 
-// Scarping for search "remote"
+const fs = require("fs/promises");
+
+// Scraping for search "remote"
 
 (async () => {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({
+    headless: false,
+    executablePath: executablePath(),
+  });
   const page = await browser.newPage();
   await page.goto("https://sg.indeed.com");
 
@@ -25,9 +31,23 @@ const { start } = require("repl");
   // Entry point for collecting data
   let isLastPage = false;
 
+  let jobs = [];
   // Collecting job data
   while (!isLastPage) {
-    let jobs = [];
+    let modal = "";
+    try {
+      modal = await page.$eval(
+        "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal > div > button",
+        (el) => el
+      );
+    } catch (error) {}
+
+    if (modal !== "") {
+      await page.click(
+        "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal > div > button"
+      );
+    }
+
     let jobsDataRight = [];
     let jobsDataLeft = [];
     // Wait for left side to load

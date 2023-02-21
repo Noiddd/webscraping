@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/Noiddd/webscraping#readme",
   "dependencies": {
-    "puppeteer": "^19.6.3"
+    "puppeteer": "^19.7.2",
+    "puppeteer-extra": "^3.3.4",
+    "puppeteer-extra-plugin-stealth": "^2.11.1"
   }
 }
