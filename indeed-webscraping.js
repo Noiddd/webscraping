@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs/promises");
+const { start } = require("repl");
 
 // Scarping for search "remote"
 
@@ -23,11 +24,12 @@ const fs = require("fs/promises");
 
   // Entry point for collecting data
   let isLastPage = false;
-  let jobs = [];
-  let jobsDataRight = [];
 
   // Collecting job data
   while (!isLastPage) {
+    let jobs = [];
+    let jobsDataRight = [];
+    let jobsDataLeft = [];
     // Wait for left side to load
     await page.waitForSelector(
       "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon"
@@ -37,7 +39,7 @@ const fs = require("fs/promises");
     await page.waitForSelector("#jobsearch-ViewjobPaneWrapper");
 
     // Collect from left side, job title, company name and salary
-    const jobsDataLeft = await page.$$eval(
+    jobsDataLeft = await page.$$eval(
       "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon",
       (el) =>
         el.map((jobData) => {
@@ -65,7 +67,8 @@ const fs = require("fs/promises");
         })
     );
 
-    console.log("job data length is " + jobsDataLeft.length);
+    console.log(jobsDataLeft);
+    console.log("job data left salary range is " + jobsDataLeft[0].salaryRange);
 
     const jobsContainerLeft = await page.$$(
       "#mosaic-provider-jobcards ul li div div div div div.job_seen_beacon"
