@@ -32,22 +32,10 @@ const fs = require("fs/promises");
   let isLastPage = false;
 
   let jobs = [];
+  let pageNumber = 0;
+
   // Collecting job data
   while (!isLastPage) {
-    let modal = "";
-    try {
-      modal = await page.$eval(
-        "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal > div > button",
-        (el) => el
-      );
-    } catch (error) {}
-
-    if (modal !== "") {
-      await page.click(
-        "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal > div > button"
-      );
-    }
-
     let jobsDataRight = [];
     let jobsDataLeft = [];
     // Wait for left side to load
@@ -96,6 +84,8 @@ const fs = require("fs/promises");
 
     // Looping through left job container to collect: href, job description and posted days ago
     for (let i = 0; i < jobsContainerLeft.length; i++) {
+      // await page.waitForTimeout((Math.floor(Math.random() * 12) + 2) * 1000);
+
       // Loop and click on left job container
       await jobsContainerLeft[i].click();
 
@@ -154,9 +144,21 @@ const fs = require("fs/promises");
     } catch (error) {}
 
     if (nextPageButton == "") {
+      const modalExitButton =
+        "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal-overlay";
+
+      if ((await page.$(modalExitButton)) !== null) {
+        await page.click(modalExitButton);
+      }
+
       await page.click(
         "#jobsearch-JapanPage div div div.jobsearch-SerpMainContent div.jobsearch-LeftPane nav div:last-of-type"
       );
+      pageNumber++;
+
+      if (pageNumber == 10) {
+        isLastPage = true;
+      }
     } else {
       isLastPage = true;
     }
