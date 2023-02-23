@@ -7,6 +7,15 @@ const fs = require("fs/promises");
 
 // Scraping for search "remote"
 
+const checkForModal = async (page) => {
+  const modalButton =
+    "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal-overlay";
+
+  if ((await page.$(modalButton)) !== null) {
+    await page.click(modalButton);
+  }
+};
+
 (async () => {
   const browser = await puppeteer.launch({
     headless: false,
@@ -36,6 +45,15 @@ const fs = require("fs/promises");
 
   // Collecting job data
   while (!isLastPage) {
+    checkForModal(page);
+
+    const modalExitButton =
+      "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal-overlay";
+
+    if ((await page.$(modalExitButton)) !== null) {
+      await page.click(modalExitButton);
+    }
+
     let jobsDataRight = [];
     let jobsDataLeft = [];
     // Wait for left side to load
@@ -144,13 +162,6 @@ const fs = require("fs/promises");
     } catch (error) {}
 
     if (nextPageButton == "") {
-      const modalExitButton =
-        "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal-overlay";
-
-      if ((await page.$(modalExitButton)) !== null) {
-        await page.click(modalExitButton);
-      }
-
       await page.click(
         "#jobsearch-JapanPage div div div.jobsearch-SerpMainContent div.jobsearch-LeftPane nav div:last-of-type"
       );
