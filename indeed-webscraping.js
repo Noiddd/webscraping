@@ -47,13 +47,6 @@ const checkForModal = async (page) => {
   while (!isLastPage) {
     checkForModal(page);
 
-    const modalExitButton =
-      "#mosaic-modal-mosaic-provider-desktopserp-jobalert-popup > div > div > div.icl-Modal-overlay";
-
-    if ((await page.$(modalExitButton)) !== null) {
-      await page.click(modalExitButton);
-    }
-
     let jobsDataRight = [];
     let jobsDataLeft = [];
     // Wait for left side to load
