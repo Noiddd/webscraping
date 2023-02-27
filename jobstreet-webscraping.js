@@ -39,7 +39,7 @@ const fs = require("fs/promises");
   let jobs = [];
   let pageNumber = 0;
 
-  //   // Collecting job data
+  // Collecting job data
 
   while (!isLastPage) {
     await page.waitForSelector(
@@ -47,6 +47,8 @@ const fs = require("fs/promises");
     );
 
     let jobsDataLeft = [];
+
+    // Looping through left job container to collect: salary, job title and company name
     jobsDataLeft = await page.$$eval(
       "#jobList > div > div > div > div > div > div > article",
       (el) => {
@@ -69,6 +71,37 @@ const fs = require("fs/promises");
 
     console.log(jobsDataLeft);
     console.log(jobsDataLeft.length);
+
+    // Looping and clicking left job container
+    // const jobsContainerLeft = await page.$$(
+    //   "#jobList > div > div > div > div > div > div > article"
+    // );
+
+    const jobsContainerLeft = await page.$$eval(
+      "#jobList > div > div > div > div > div > div > article",
+      (el) =>
+        el.map((jobContainerLeft) => {
+          jobContainerLeft.click();
+        })
+    );
+
+    // for (let i = 0; i < jobsContainerLeft.length; i++) {
+    //   // Loop and click on left job container
+
+    //   await jobsContainerLeft[i].click();
+
+    //   // Wait for right side to load
+    //   await page.waitForSelector(
+    //     "#contentContainer > div.sx2jih0.zcydq85a > div > div > div > div.sx2jih0.zcydq8r.zcydq8p._16wtmva0 > div > div > div > div.sx2jih0.zcydq85a.zcydq8n._1dg3x0m3 > div > div.sx2jih0.zcydq86q.zcydq86v.zcydq86w.zcydq87q.zcydq87v.zcydq87w.zcydq896.zcydq886.es8sxo18.es8sxo1b.zcydq832.zcydq835 > div > div:nth-child(1) > div > div:nth-child(1) > div"
+    //   );
+
+    //   const jobDescription = await page.$eval(
+    //     "#contentContainer > div.sx2jih0.zcydq85a > div > div > div > div.sx2jih0.zcydq8r.zcydq8p._16wtmva0 > div > div > div > div.sx2jih0.zcydq85a.zcydq8n._1dg3x0m3 > div > div.sx2jih0.zcydq86q.zcydq86v.zcydq86w.zcydq87q.zcydq87v.zcydq87w.zcydq896.zcydq886.es8sxo18.es8sxo1b.zcydq832.zcydq835 > div > div:nth-child(1) > div > div:nth-child(1) > div div h4",
+    //     (el) => el.textContent
+    //   );
+
+    //   console.log(jobDescription);
+    // }
 
     isLastPage = true;
   }
